@@ -153,7 +153,7 @@ export class PeekableIterator<T> extends Peekable<T> {
 export class MapIterator<T, U> extends Iterator<U> {
   constructor(
     private readonly input: Iterator<T>,
-    private readonly fn: (item: T) => U,
+    private readonly fn: (item: T) => U
   ) {
     super();
   }
@@ -168,7 +168,7 @@ export class FlatMapIterator<T, U> extends Iterator<U> {
 
   constructor(
     private readonly input: Iterator<T>,
-    private readonly fn: (item: T) => IntoIterator<U>,
+    private readonly fn: (item: T) => IntoIterator<U>
   ) {
     super();
     this.currentIter = none();
@@ -194,7 +194,7 @@ export class FilterIterator<T> extends Iterator<T> {
 
   constructor(
     private readonly input: Iterator<T>,
-    private readonly predicate: (item: T) => boolean,
+    private readonly predicate: (item: T) => boolean
   ) {
     super();
   }
@@ -216,7 +216,7 @@ export class TakeIterator<T> extends Iterator<T> {
 
   constructor(
     private readonly input: Iterator<T>,
-    private readonly count: number,
+    private readonly count: number
   ) {
     super();
     this.counter = 0;
@@ -232,7 +232,7 @@ export class TakeIterator<T> extends Iterator<T> {
 export class TakeWhileIterator<T> extends Iterator<T> {
   constructor(
     private readonly input: Iterator<T>,
-    private readonly predicate: (item: T) => boolean,
+    private readonly predicate: (item: T) => boolean
   ) {
     super();
   }
@@ -244,15 +244,14 @@ export class TakeWhileIterator<T> extends Iterator<T> {
   }
 }
 
-type Iterators<T extends any[]> =
-  & {
-    [I in keyof T]: Iterator<T[I]>;
-  }
-  & { length: T["length"] };
+type Iterators<T extends any[]> = {
+  [I in keyof T]: Iterator<T[I]>;
+} & { length: T["length"] };
 
 type Prepend<T, U extends any[]> = ((_t: T, ..._u: U) => unknown) extends (
   ..._: infer Result
-) => unknown ? Result
+) => unknown
+  ? Result
   : never;
 
 export class ZipIterator<T extends any[]> extends Iterator<T> {
@@ -277,7 +276,7 @@ export class Range extends Iterator<number> {
   constructor(
     private readonly from: number,
     private readonly to?: number,
-    private readonly inc: number = 1,
+    private readonly inc: number = 1
   ) {
     super();
     if (this.to === undefined) {
@@ -290,7 +289,7 @@ export class Range extends Iterator<number> {
   public _next(): Option<number> {
     if (this.checkDone()) return none();
     const item = this._current;
-    this._current = this._current.map((c) => c += this.inc);
+    this._current = this._current.map((c) => (c += this.inc));
     return item;
   }
 
