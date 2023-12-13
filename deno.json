@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-read lib/main.ts",
+    "gen": "deno run --allow-read --allow-write scripts/gen_cst_types.ts"
+  },
+  "imports": {
+    "chevrotain": "npm:chevrotain@11.0.3",
+    "$lib/": "./lib/",
+    "$scripts/": "./scripts/"
+  }
+}
