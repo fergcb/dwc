@@ -1,0 +1,13 @@
+- Prefix Operators (`!`, `~`, `-`, `+`)
+- Binary Operators
+  - Exponentiation (`^`)
+  - Multiplicative (`*`, `/`, `%`)
+  - Additive (`+`, `-`)
+  - Bitwise Shift (`<<`, `>>`, `>>>`),
+  - Relational (`<`, `<=`, `>`, `>=`)
+  - Equality (`==`, `!=`, `is`),
+  - Bitwise AND
+  - Bitwise XOR
+  - Bitwise OR
+  - Logical AND
+  - Logical OR

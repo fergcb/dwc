@@ -1,0 +1,15 @@
+
+const res = io::readTextFileSync("input/01.txt")
+  .or_panic()
+  .lines()
+  .map(
+    _.chars()
+     .filter(isDigit)
+     .collect()
+     .pick([0, -1])
+     .join()
+     .parseInt(10)
+  )
+  .sum();
+
+io::println(res);

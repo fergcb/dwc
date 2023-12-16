@@ -1,6 +1,7 @@
 import { parser } from "$lib/parser.ts";
 import {
   ArgumentsCstChildren,
+  BinaryExpressionCstChildren,
   CallExpressionCstChildren,
   DotMemberCstChildren,
   DoubleColonMemberCstChildren,
@@ -32,8 +33,7 @@ class DwCstVisitor extends BaseCstVisitor
   }
 
   public Program(node: ProgramCstChildren, ctx: VisitorContext): ast.Program {
-    const stmts = node.Statement.map((stmt) => this.visit(stmt, ctx)) ??
-      [];
+    const stmts = node.Statement.map((stmt) => this.visit(stmt, ctx)) ?? [];
 
     const pos = mergePos(
       ...node.Statement.map((stmt) => cstNodePos(stmt, ctx.sourceName)),
@@ -78,13 +78,31 @@ class DwCstVisitor extends BaseCstVisitor
     node: ExpressionCstChildren,
     ctx: VisitorContext,
   ): ast.Expression {
-    return this.visit(node.CallExpression, ctx);
+    return this.visit(node.BinaryExpression, ctx);
+  }
+
+  public BinaryExpression(
+    node: BinaryExpressionCstChildren,
+    ctx: VisitorContext,
+  ): ast.Expression {
+    const head = this.visit(node.CallExpression[0], ctx);
+    if (node.BinaryOperator) {
+      const ops = node.BinaryOperator.map((op, i) =>
+        [
+          op.image as ast.BinOp,
+          this.visit(node.CallExpression[i + 1], ctx) as ast.Expression,
+        ] as const
+      );
+      return ast.BinaryExpression.from(head, ops);
+    }
+
+    return head;
   }
 
   public CallExpression(
     node: CallExpressionCstChildren,
     ctx: VisitorContext,
-  ): ast.CallExpr {
+  ): ast.Expression {
     const expr = this.visit(node.MemberExpression, ctx);
     if (node.Arguments) {
       return new ast.CallExpr(
@@ -159,10 +177,7 @@ class DwCstVisitor extends BaseCstVisitor
     ctx: VisitorContext,
   ): ast.IdentifierExpr {
     const ident = node.Identifier[0];
-    return new ast.IdentifierExpr(
-      ident.image,
-      tokenPos(ident, ctx.sourceName),
-    );
+    return new ast.IdentifierExpr(ident.image, tokenPos(ident, ctx.sourceName));
   }
 
   public IntegerLiteralExpr(

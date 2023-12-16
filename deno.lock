@@ -3,6 +3,7 @@
   "packages": {
     "specifiers": {
       "npm:@types/estree": "npm:@types/estree@1.0.1",
+      "npm:@types/estree@1.0.5": "npm:@types/estree@1.0.5",
       "npm:chevrotain": "npm:chevrotain@11.0.3",
       "npm:chevrotain@11.0.3": "npm:chevrotain@11.0.3"
     },
@@ -36,6 +37,10 @@
       },
       "@types/estree@1.0.1": {
         "integrity": "sha512-LG4opVs2ANWZ1TJoKc937iMmNstM/d0ae1vNbnBvBhqCSezgVUOzcLCqbI5elV8Vy6WKwKjaqR+zO9VKirBBCA==",
+        "dependencies": {}
+      },
+      "@types/estree@1.0.5": {
+        "integrity": "sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==",
         "dependencies": {}
       },
       "chevrotain@11.0.3": {

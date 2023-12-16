@@ -1,0 +1,253 @@
+  /////////////////////////////////////////
+ // Variables, constants and mutability //
+/////////////////////////////////////////
+
+/*
+ * The `let` keyword is used to declare a variable.
+ * 
+ * A variable must always be initialised with a value.
+ * In Deathwish, there is no concept of "null" or "zero-values";
+ * if you want 0, the empty string, false, or anything else,
+ * you must explicitly declare that value.
+ *
+ * If you want to declare a variable that may not have a value,
+ * you should use the Option type. More on that later.
+ *
+ * By default, variables are immutable and constant. This means
+ * that they cannot be reassigned with a new value, and that
+ * the values they hold cannot be modified in any way.
+ *
+ * If you wish to declare a mutable variable, you should use the
+ * `mut` keyword, which is short for "mutable". It follows `let`,
+ * and indicates that the variable can be reassigned and mutated
+ * later on.
+ */
+
+{
+  let x = 5
+  x = 10 // compiler error
+  x += 1 // compiler error
+
+  let mut y = 0
+  y = 5 // fine
+  y += 1 // also fine
+
+  let X = [1, 2, 3]
+  X.push(4) // compiler error
+
+  let mut Y = [5, 6, 7]
+  Y.push(8) // fine
+}
+
+/*
+ * Another modifier to the `let` statement is the `lazy`
+ * keyword, which specifies that the variable's value
+ * should be evaluated lazily.
+ *
+ * Lazy evaluation means that the expression is not
+ * evaluated until the first time the variable is used.
+ *
+ * This allows a variable's value to depend on code that
+ * comes after the its declaration.
+ */
+
+{
+  let mut a = 10
+  lazy let b = a + 5
+  a = 15
+  io::println(b) // >>> 20
+}
+
+  ///////////////////////////
+ // Types & type checking //
+///////////////////////////
+
+/*
+ * You may have noticed that none of the variable declarations
+ * above have type annotations. This is because the DeathWish
+ * compiler automatically infers the type of the variable
+ * where possible.
+ * 
+ * The compiler will settle on the most restrictive type
+ * possible. For constant primitives, this will be the
+ * literal type of the value.
+ */
+
+
+// So this:
+{
+  let x = 5
+  let y = someFuncReturningString()
+}
+
+// is equivalent to this:
+{
+  let x: int = 5
+  let y: string = someFuncReturningString()
+}
+
+  /////////////////////
+ // The Option Type //
+/////////////////////
+
+/*
+ * As previously mentioned, DeathWish has no concept of
+ * "null", "undefined", or any such variation on this
+ * "no value" magic constant.
+ *
+ * Instead, DeathWish offers the built-in `Option` type,
+ * which is an enum with two members, `Some(value)` and `None`.
+ *
+ * The use of the Option type forces the programmer to
+ * deal with the possibility of the absence of a value,
+ * or at least to explicitly acknowledge the possibility
+ * of a runtime error being thrown if an uncertain value
+ * is used without being checked first.
+ */
+
+{
+  // Only print the value inside x if it is present
+  let x: Option<String> = maybeValue()
+  if (x.isSome()) {
+    io::println(x.unwrap())
+  }
+}
+
+/*
+ * There are also a number of conventient built-in methods
+ * for working with values of the Option type and safely
+ * resolving uncertain values.
+ *
+ * The code above can be simplified as follows:
+ */
+
+{
+  let x = maybeValue()
+  x.ifPresent(io::println)
+}
+
+/*
+ * You can use the Option type to perform sequences
+ * of operations safely on uncertain values, like so:
+ */
+
+{
+  Some(4)
+    .map(_ * 2) // Some(8)
+    .orElse(0) // 8
+
+  None
+    .map(_ * 2) // None
+    .orElse(0) // 0
+}
+
+  ///////////////
+ // Functions //
+///////////////
+
+/*
+ * Functions in DeathWish are defined using the `func`
+ * keyword, followed by zero or more typed parameters,
+ * and a return type.
+ *
+ * Each time a function is called, the expression after
+ * the arrow (`=>`) is evaluated, with the appropriate
+ * arguments.
+ */
+
+func lookSay (number: Int): Int => {
+  number.toString()
+        .chars()
+        .groupBy((c, group) => group.first() is Some(x) && x == c)
+        .flatMap(g => [g.first()!, g.length().toString()])
+        .join()
+        .parseInt(10)!
+}
+
+func quickSort (list: List<T>): List<T> where T is Ordered => {
+  if (list.length < 2) return list
+
+  let { left, pivot, right } = list.partition<>((x, i, { pivot }) => {
+    if (i == 0) 'pivot'
+    else if (x < pivot.first!()) 'left'
+    else 'right'
+  })
+
+  List::concat(quickSort(left), pivot, quickSort(right))
+}
+
+func quickSort (list: List<T>): List<T> where T is Ordered => {
+  if (list.length < 2) return list
+
+  let { left, pivot, right } = list.partition<{pivot: List<T>, left: List<T>, right: List<T>}>((x, i, { pivot }): 'pivot' | 'left' | 'right' => {
+    if (i == 0) 'pivot'
+    else if (x < pivot.first!()) 'left'
+    else 'right'
+  })
+}
+
+module databases {
+  export func connectTo (uri: string): Connection {
+    // do database stuff
+  }
+
+  struct Connection {
+    uri: string,
+    ...
+  }
+
+  macro (self: Connection) createModel (table: string, config: ModelConfig): Model {
+    for (name=type in config.schema) {
+      emit 
+    }
+  }
+}
+
+let uri = "mongodb://root:root@localhost:27017/mydb"
+let db = databases::connectTo(uri)
+
+let User = db.createModel('users', {
+  schema = {
+    id = types.int.generated.primaryKey,
+    firstName = types.string.required,
+    lastName = types.string.required,
+    age = types.int.required,
+  },
+  computed = {
+    fullName = (self) => self.firstName + ' ' + self.lastName,
+  }
+})
+
+await db.init()
+
+let newUser = User.create({
+  firstName = "Fergus",
+  lastName = "Bentley",
+  age = 23,
+})
+
+let user = await newUser.commit()
+
+
+// |> is the function chaining operator
+//   f(x) |> g |> h
+// is equivalent to
+//   h(g(f(x)))
+//
+// ||> is the async function chaining operator
+//   f(x) ||> g ||> h
+// is equivalent to
+//   h(await g(await f(x)))
+
+let data = fetch(uri) ||> Response::body |> JSON::parse<Post>
+
+// is equivalent to
+//   let res = JSON::parse<Post>((await fetch(uri)).body)
+// or
+//   let res = await fetch(uri)
+//   let body = res.body
+//   let data = JSON::parse<Post>(body)
+
+// Partial application can be used with function chaining:
+
+let 

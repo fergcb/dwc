@@ -1,0 +1,9 @@
+// This is a comment
+/*
+ This is a
+ multi line
+ comment
+ */
+
+let x = group.first() is Some(x) && x == c;
+let data = fetch(uri) ||> Response::body |> JSON::parse;

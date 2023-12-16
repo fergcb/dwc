@@ -48,7 +48,17 @@ export interface ExpressionCstNode extends CstNode {
 }
 
 export type ExpressionCstChildren = {
-  CallExpression: CallExpressionCstNode[];
+  BinaryExpression: BinaryExpressionCstNode[];
+};
+
+export interface BinaryExpressionCstNode extends CstNode {
+  name: "BinaryExpression";
+  children: BinaryExpressionCstChildren;
+}
+
+export type BinaryExpressionCstChildren = {
+  CallExpression: (CallExpressionCstNode)[];
+  BinaryOperator?: IToken[];
 };
 
 export interface CallExpressionCstNode extends CstNode {
@@ -138,6 +148,7 @@ export interface ICstNodeVisitor<IN, OUT> extends ICstVisitor<IN, OUT> {
   LetAssignmentStmt(children: LetAssignmentStmtCstChildren, param?: IN): OUT;
   ExpressionStmt(children: ExpressionStmtCstChildren, param?: IN): OUT;
   Expression(children: ExpressionCstChildren, param?: IN): OUT;
+  BinaryExpression(children: BinaryExpressionCstChildren, param?: IN): OUT;
   CallExpression(children: CallExpressionCstChildren, param?: IN): OUT;
   Arguments(children: ArgumentsCstChildren, param?: IN): OUT;
   MemberExpression(children: MemberExpressionCstChildren, param?: IN): OUT;

@@ -35,7 +35,15 @@ class DwParser extends CstParser {
   });
 
   private Expression = this.RULE("Expression", () => {
+    this.SUBRULE(this.BinaryExpression);
+  });
+
+  private BinaryExpression = this.RULE("BinaryExpression", () => {
     this.SUBRULE(this.CallExpression);
+    this.MANY(() => {
+      this.CONSUME(Token.BinaryOperator);
+      this.SUBRULE2(this.CallExpression);
+    });
   });
 
   private CallExpression = this.RULE("CallExpression", () => {
@@ -61,10 +69,11 @@ class DwParser extends CstParser {
     this.SUBRULE(this.PrimaryExpression);
     this.OPTION(() => {
       this.OR(
-        this.cMemberExpression || (this.cMemberExpression = [
-          { ALT: () => this.SUBRULE2(this.DotMember) },
-          { ALT: () => this.SUBRULE2(this.DoubleColonMember) },
-        ]),
+        this.cMemberExpression ||
+          (this.cMemberExpression = [
+            { ALT: () => this.SUBRULE2(this.DotMember) },
+            { ALT: () => this.SUBRULE2(this.DoubleColonMember) },
+          ]),
       );
     });
   });
@@ -81,10 +90,11 @@ class DwParser extends CstParser {
 
   private PrimaryExpression = this.RULE("PrimaryExpression", () => {
     this.OR(
-      this.cPrimaryExpression || (this.cPrimaryExpression = [
-        { ALT: () => this.SUBRULE(this.IdentifierExpr) },
-        { ALT: () => this.SUBRULE(this.IntegerLiteralExpr) },
-      ]),
+      this.cPrimaryExpression ||
+        (this.cPrimaryExpression = [
+          { ALT: () => this.SUBRULE(this.IdentifierExpr) },
+          { ALT: () => this.SUBRULE(this.IntegerLiteralExpr) },
+        ]),
     );
   });
 
